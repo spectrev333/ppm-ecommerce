@@ -1,0 +1,41 @@
+<!-- products/templates/products/product_list.html -->
+{% extends 'base.html' %}
+
+{% block title %}Tutti i Prodotti{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-3">
+        <h4 class="mb-3">Categorie</h4>
+        <div class="list-group rounded-3">
+            <a href="{% url 'products:product_list' %}" class="list-group-item list-group-item-action {% if not category %}active{% endif %} rounded-top-3">Tutte le Categorie</a>
+            {% for cat in categories %}
+                <a href="{{ cat.get_absolute_url }}" class="list-group-item list-group-item-action {% if category and category.slug == cat.slug %}active{% endif %}">{{ cat.name }}</a>
+            {% endfor %}
+        </div>
+    </div>
+    <div class="col-md-9">
+        <h2 class="mb-4">Prodotti</h2>
+        <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+            {% for product in products %}
+            <div class="col">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <h5 class="card-title">{{ product.name }}</h5>
+                        <p class="card-text text-muted">{{ product.category.name }}</p>
+                        <p class="card-text">{{ product.description|truncatechars:70 }}</p>
+                    </div>
+                    <div class="card-footer d-flex justify-content-between align-items-center">
+                        <span class="fw-bold fs-5">{{ product.price }} €</span>
+                        <a href="{{ product.get_absolute_url }}" class="btn btn-primary btn-sm">Dettagli</a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% if not products %}
+            <p class="text-center text-muted mt-5">Nessun prodotto disponibile in questa categoria.</p>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

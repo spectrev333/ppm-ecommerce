@@ -1,0 +1,34 @@
+<!-- products/templates/products/product_detail.html -->
+{% extends 'base.html' %}
+
+{% block title %}{{ product.name }}{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-6 mb-4">
+        {% if product.image %}
+            <img src="{{ product.image.url }}" class="img-fluid rounded-3 shadow-sm" alt="{{ product.name }}">
+        {% else %}
+            <img src="https://placehold.co/600x400/cccccc/333333?text=Nessuna+Immagine" class="img-fluid rounded-3 shadow-sm" alt="Nessuna Immagine">
+        {% endif %}
+    </div>
+    <div class="col-md-6">
+        <h1 class="display-5">{{ product.name }}</h1>
+        <p class="text-muted fs-6">{{ product.category.name }}</p>
+        <h3 class="fw-bold text-primary mb-3">{{ product.price }} €</h3>
+        <p class="lead">{{ product.description }}</p>
+
+        {# Form per aggiungere al carrello (verrà implementato nell'app orders) #}
+        <form action="#" method="post" class="mt-4">
+            {% csrf_token %}
+            <div class="input-group mb-3" style="max-width: 150px;">
+                <label for="quantity" class="input-group-text rounded-start-3">Quantità:</label>
+                <input type="number" id="quantity" name="quantity" value="1" min="1" class="form-control rounded-end-3" aria-label="Quantità">
+            </div>
+            <button type="submit" class="btn btn-primary btn-lg rounded-3">Aggiungi al Carrello</button>
+        </form>
+
+        <a href="{% url 'products:product_list' %}" class="btn btn-outline-secondary mt-4 rounded-3">Torna ai Prodotti</a>
+    </div>
+</div>
+{% endblock %}
