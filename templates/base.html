@@ -5,53 +5,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}E-commerce Store{% endblock %}</title>
-    <!-- Bootstrap CSS CDN -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6Axyi/N6jIeHz" crossorigin="anonymous">
-    <style>
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: #f8f9fa;
-            color: #343a40;
-        }
-        .container {
-            padding-top: 20px;
-            padding-bottom: 20px;
-        }
-        .navbar {
-            background-color: #007bff;
-            border-radius: 0 0 10px 10px;
-        }
-        .navbar-brand, .nav-link {
-            color: white !important;
-        }
-        .card {
-            border-radius: 10px;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-        }
-        .btn-primary {
-            background-color: #007bff;
-            border-color: #007bff;
-            border-radius: 5px;
-        }
-        .btn-primary:hover {
-            background-color: #0056b3;
-            border-color: #004085;
-        }
-        .footer {
-            margin-top: 40px;
-            padding: 20px;
-            text-align: center;
-            background-color: #e9ecef;
-            border-radius: 10px 10px 0 0;
-        }
-        img {
-            border-radius: 8px;
-        }
-    </style>
-</head>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-4Q6Gf2aSP4eDXB8Miphtr37CMZZQ5oXLH2yaXMJ2w8e2ZtHTl7GptT4jmndRuHDT" crossorigin="anonymous"></head>
 <body>
-    <nav class="navbar navbar-expand-lg navbar-dark mb-4">
-        <div class="container">
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark mb-4">
+        <div class="container-fluid">
             <a class="navbar-brand" href="{% url 'products:product_list' %}">E-commerce Django</a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
@@ -62,21 +20,30 @@
                         <a class="nav-link" href="{% url 'products:product_list' %}">Prodotti</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#">Carrello</a> {# Verrà aggiornato con la logica del carrello #}
+                        <a class="nav-link" href="{% url 'orders:cart_detail' %}">Carrello</a> {# Verrà aggiornato con la logica del carrello #}
                     </li>
                     {% if user.is_authenticated %}
-                        <li class="nav-item">
-                            <a class="nav-link" href="#">Ciao, {{ user.username }}</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="#">Logout</a> {# Verrà aggiornato con la logica di logout #}
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                Ciao, {{ user.username }}
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
+                                <li><a class="dropdown-item" href="#">I miei ordini</a></li> {# Placeholder, puoi implementarlo #}
+                                <li><hr class="dropdown-divider"></li>
+                                <li>
+                                    <form action="{% url 'logout' %}" method="post" class="d-inline">
+                                        {% csrf_token %}
+                                        <button type="submit" class="dropdown-item">Logout</button>
+                                    </form>
+                                </li>
+                            </ul>
                         </li>
                     {% else %}
                         <li class="nav-item">
-                            <a class="nav-link" href="#">Login</a> {# Verrà aggiornato con la logica di login #}
+                            <a class="nav-link" href="{% url 'login' %}">Login</a> {# Verrà aggiornato con la logica di login #}
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="#">Registrati</a> {# Verrà aggiornato con la logica di registrazione #}
+                            <a class="nav-link" href="{% url 'register' %}">Registrati</a> {# Verrà aggiornato con la logica di registrazione #}
                         </li>
                     {% endif %}
                 </ul>
@@ -85,17 +52,23 @@
     </nav>
 
     <div class="container">
+        {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        {% endfor %}
+        {% endif %}
         {% block content %}
         {% endblock %}
     </div>
 
     <footer class="footer mt-auto py-3">
         <div class="container">
-            <span class="text-muted">© 2024 E-commerce Django. Tutti i diritti riservati.</span>
+            <span class="text-muted">© 2025 E-commerce Django. Tutti i diritti riservati.</span>
         </div>
     </footer>
 
-    <!-- Bootstrap JS Bundle with Popper -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
-</body>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/js/bootstrap.bundle.min.js" integrity="sha384-j1CDi7MgGQ12Z7Qab0qlWQ/Qqz24Gc6BM0thvEMVjHnfYGF0rmFCozFSxQBxwHKO" crossorigin="anonymous"></script></body>
 </html>

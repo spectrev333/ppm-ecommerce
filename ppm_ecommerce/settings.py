@@ -38,8 +38,9 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
 
-    "products.apps.ProductsConfig",
-    "users.apps.UsersConfig"
+    "products",
+    "users",
+    "orders",
 ]
 
 MIDDLEWARE = [
@@ -125,3 +126,6 @@ STATIC_URL = "static/"
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+# session id per la gestione del carrello
+CART_SESSION_ID = 'cart'

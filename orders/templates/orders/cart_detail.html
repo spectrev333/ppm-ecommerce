@@ -1,0 +1,58 @@
+{% extends 'base.html' %}
+
+{% block title %}Il Tuo Carrello{% endblock %}
+
+{% block content %}
+<h1 class="mb-4">Il Tuo Carrello</h1>
+<table class="table table-hover table-striped">
+    <thead class="table-dark">
+        <tr>
+            <th scope="col">Prodotto</th>
+            <th scope="col">Quantità</th>
+            <th scope="col">Prezzo</th>
+            <th scope="col">Totale</th>
+            <th scope="col"></th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for item in cart %}
+            <tr>
+                <td><a href="{{ item.product.get_absolute_url }}" class="text-decoration-none text-dark">{{ item.product.name }}</a></td>
+                <td>
+                    <form action="{% url 'orders:cart_add' item.product.id %}" method="post" class="d-flex align-items-center">
+                        {% csrf_token %}
+                        {{ item.update_quantity_form.quantity }}
+                        {{ item.update_quantity_form.override }}
+                        <button type="submit" class="btn btn-sm btn-outline-primary ms-2 rounded-3">Aggiorna</button>
+                    </form>
+                </td>
+                <td>{{ item.price }} €</td>
+                <td>{{ item.total_price }} €</td>
+                <td>
+                    <form action="{% url 'orders:cart_remove' item.product.id %}" method="post">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-sm btn-danger rounded-3">Rimuovi</button>
+                    </form>
+                </td>
+            </tr>
+        {% empty %}
+            <tr>
+                <td colspan="5" class="text-center text-muted py-4">Il tuo carrello è vuoto.</td>
+            </tr>
+        {% endfor %}
+        {% if cart %}
+            <tr class="table-info">
+                <td colspan="3" class="text-end fw-bold">Totale Carrello:</td>
+                <td colspan="2" class="fw-bold">{{ cart.get_total_price }} €</td>
+            </tr>
+        {% endif %}
+    </tbody>
+</table>
+
+<div class="d-flex justify-content-between mt-4">
+    <a href="{% url 'products:product_list' %}" class="btn btn-outline-secondary rounded-3">Continua lo Shopping</a>
+    {% if cart %}
+        <a href="{% url 'orders:order_create' %}" class="btn btn-success rounded-3">Checkout</a>
+    {% endif %}
+</div>
+{% endblock %}

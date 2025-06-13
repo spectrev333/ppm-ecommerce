@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+
+{% block title %}Ordine Completato{% endblock %}
+
+{% block content %}
+<div class="text-center py-5">
+    <h1 class="display-4 text-success mb-4">Grazie per il tuo ordine!</h1>
+    <p class="lead">Il tuo ordine #{{ order.id }} è stato creato con successo.</p>
+    <p class="mb-4">Riceverai una conferma via email a breve.</p>
+    <a href="{% url 'products:product_list' %}" class="btn btn-primary btn-lg rounded-3">Continua lo Shopping</a>
+</div>
+{% endblock %}
