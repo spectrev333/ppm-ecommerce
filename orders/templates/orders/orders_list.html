@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+
+{% block title %}I Miei Ordini{% endblock %}
+
+{% block content %}
+<h1 class="mb-4">I Miei Ordini</h1>
+
+{% if orders %}
+    <div class="list-group">
+        {% for order in orders %}
+            <a href="{% url 'orders:order_detail' order_id=order.id %}" class="list-group-item list-group-item-action mb-3 rounded-3 shadow-sm" aria-current="true">
+                <div class="d-flex w-100 justify-content-between">
+                    <h5 class="mb-1">Ordine #{{ order.id }}</h5>
+                    <small class="text-muted">{{ order.created|date:"d M Y H:i" }}</small>
+                </div>
+                <p class="mb-1">Totale: <strong>{{ order.get_total_cost }} €</strong></p>
+                {# Mostra lo stato con i colori #}
+                <small>Stato:
+                    {% if order.status == 'pending' %}
+                        <span class="badge bg-warning text-dark">{{ order.get_status_display }}</span>
+                    {% elif order.status == 'paid' or order.status == 'processing' %}
+                        <span class="badge bg-info">{{ order.get_status_display }}</span>
+                    {% elif order.status == 'shipped' %}
+                        <span class="badge bg-primary">In Spedizione</span>
+                    {% elif order.status == 'completed' %}
+                        <span class="badge bg-success">{{ order.get_status_display }}</span>
+                    {% elif order.status == 'cancelled' %}
+                        <span class="badge bg-danger">{{ order.get_status_display }}</span>
+                    {% else %}
+                        <span class="badge bg-secondary">{{ order.get_status_display }}</span>
+                    {% endif %}
+                </small>
+                {# Rimuovi gli articoli da qui, verranno visualizzati nella pagina di dettaglio #}
+            </a>
+        {% endfor %}
+    </div>
+
+    {# ... (paginazione rimane uguale) ... #}
+
+{% else %}
+    <div class="alert alert-info text-center mt-5" role="alert">
+        Non hai ancora effettuato ordini.
+    </div>
+    <div class="text-center">
+        <a href="{% url 'products:product_list' %}" class="btn btn-primary rounded-3">Inizia lo Shopping</a>
+    </div>
+{% endif %}
+{% endblock %}

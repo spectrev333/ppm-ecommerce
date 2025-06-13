@@ -1,9 +1,14 @@
+from django.contrib import messages
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.http import Http404
 from django.shortcuts import render, get_object_or_404, redirect
 from django.views.decorators.http import require_POST
+from django.views.generic import ListView, DetailView
 
 from orders.cart import Cart
 from orders.forms import CartAddProductForm, OrderCreateForm
-from orders.models import OrderItem
+from orders.models import OrderItem, Order
 from products.models import Product
 
 
@@ -63,10 +68,67 @@ def order_create(request):
                 'last_name': request.user.last_name,
                 'email': request.user.email,
                 'address': request.user.address,
-                'phone_number': request.user.phone_number,
+                'postal_code': request.user.cap,
+                'city': request.user.city,
             }
-            form = OrderCreateForm(initial=user_data)
+            form = OrderCreateForm(user_data)
         else:
             form = OrderCreateForm()
     return render(request, 'orders/order_create.html', {'cart': cart, 'form': form})
 
+
+class OrderListView(LoginRequiredMixin, ListView):
+    model = Order
+    template_name = 'orders/orders_list.html'
+    context_object_name = 'orders'
+    paginate_by = 10
+
+    def get_queryset(self):
+        return Order.objects.filter(user=self.request.user).order_by('-created')
+
+
+class OrderDetailView(LoginRequiredMixin, DetailView):
+    model = Order
+    template_name = 'orders/order_detail.html'
+    context_object_name = 'order'
+    pk_url_kwarg = 'order_id'
+
+    def get_queryset(self):
+        return Order.objects.filter(user=self.request.user)
+
+    def get_object(self, queryset=None):
+        obj = super().get_object(queryset)
+        if obj.user != self.request.user:
+            raise Http404("Ordine non trovato o non autorizzato.")
+        return obj
+
+
+@require_POST
+@login_required
+def order_pay_simulate(request, order_id):
+    order = get_object_or_404(Order, id=order_id, user=request.user)
+
+    if not order.paid and order.status == 'pending':
+        order.paid = True
+        order.status = 'processing' # Dopo il pagamento, lo stato diventa "in elaborazione"
+        order.save()
+        messages.success(request, f"L'ordine #{order.id} è stato contrassegnato come pagato e in elaborazione!")
+    else:
+        messages.warning(request, f"L'ordine #{order.id} non può essere pagato in questo stato.")
+
+    return redirect('orders:order_detail', order_id=order.id)
+
+
+@require_POST
+@login_required
+def order_cancel(request, order_id):
+    order = get_object_or_404(Order, id=order_id, user=request.user)
+
+    if order.status in ['pending', 'paid', 'processing']:
+        order.status = 'cancelled'
+        order.save()
+        messages.info(request, f"L'ordine #{order.id} è stato annullato.")
+    else:
+        messages.error(request, f"L'ordine #{order.id} non può essere annullato in questo stato ({order.get_status_display()}).")
+
+    return redirect('orders:order_detail', order_id=order.id)

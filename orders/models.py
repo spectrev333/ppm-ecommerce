@@ -6,6 +6,15 @@ from products.models import Product
 
 # Create your models here.
 class Order(models.Model):
+    STATUS_CHOICES = (
+        ('pending', 'In attesa di Pagamento'),
+        ('paid', 'Pagato'),
+        ('processing', 'In Elaborazione'),
+        ('shipped', 'Spedito'),
+        ('completed', 'Completato'),
+        ('cancelled', 'Annullato'),
+    )
+
     user = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='orders', on_delete=models.CASCADE)
     first_name = models.CharField(max_length=50)
     last_name = models.CharField(max_length=50)
@@ -15,7 +24,8 @@ class Order(models.Model):
     city = models.CharField(max_length=100)
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
-    paid = models.BooleanField(default=False) # Indica se l'ordine è stato pagato
+    paid = models.BooleanField(default=False)
+    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='pending')
 
     class Meta:
         ordering = ('-created',) # Ordina dal più recente

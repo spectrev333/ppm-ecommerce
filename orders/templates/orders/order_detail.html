@@ -1,0 +1,91 @@
+{% extends 'base.html' %}
+
+{% block title %}Dettagli Ordine #{{ order.id }}{% endblock %}
+
+{% block content %}
+<h1 class="mb-4">Dettagli Ordine #{{ order.id }}</h1>
+
+<div class="card shadow-lg p-4 mb-4">
+    <div class="card-body">
+        <h5 class="card-title mb-3">Informazioni Generali</h5>
+        <p><strong>Data Ordine:</strong> {{ order.created|date:"d M Y H:i" }}</p>
+        <p><strong>Ultimo Aggiornamento:</strong> {{ order.updated|date:"d M Y H:i" }}</p>
+        <p><strong>Stato Pagamento:</strong>
+            {% if order.paid %}
+                <span class="badge bg-success">Pagato</span>
+            {% else %}
+                <span class="badge bg-warning text-dark">Non Pagato</span>
+            {% endif %}
+        </p>
+        <p><strong>Stato Ordine:</strong>
+            {% if order.status == 'pending' %}
+                <span class="badge bg-warning text-dark">{{ order.get_status_display }}</span>
+            {% elif order.status == 'paid' or order.status == 'processing' %}
+                <span class="badge bg-info">{{ order.get_status_display }}</span>
+            {% elif order.status == 'shipped' %}
+                <span class="badge bg-primary">In Spedizione</span>
+            {% elif order.status == 'completed' %}
+                <span class="badge bg-success">{{ order.get_status_display }}</span>
+            {% elif order.status == 'cancelled' %}
+                <span class="badge bg-danger">{{ order.get_status_display }}</span>
+            {% else %}
+                <span class="badge bg-secondary">{{ order.get_status_display }}</span>
+            {% endif %}
+        </p>
+
+        <h5 class="card-title mt-4 mb-3">Indirizzo di Spedizione</h5>
+        <p>{{ order.first_name }} {{ order.last_name }}</p>
+        <p>{{ order.address }}</p>
+        <p>{{ order.postal_code }} {{ order.city }}</p>
+        <p>Email: {{ order.email }}</p>
+
+        <h5 class="card-title mt-4 mb-3">Articoli dell'Ordine</h5>
+        <table class="table table-bordered table-striped">
+            <thead>
+                <tr>
+                    <th>Prodotto</th>
+                    <th>Quantità</th>
+                    <th>Prezzo Unitario</th>
+                    <th>Subtotale</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in order.items.all %}
+                    <tr>
+                        <td><a href="{{ item.product.get_absolute_url }}">{{ item.product.name }}</a></td>
+                        <td>{{ item.quantity }}</td>
+                        <td>{{ item.price }} €</td>
+                        <td>{{ item.get_cost }} €</td>
+                    </tr>
+                {% endfor %}
+                <tr class="table-dark">
+                    <td colspan="3" class="text-end fw-bold">Totale Ordine:</td>
+                    <td class="fw-bold">{{ order.get_total_cost }} €</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="d-flex justify-content-between mt-4">
+            <a href="{% url 'orders:orders_list' %}" class="btn btn-outline-secondary rounded-3">Torna ai Miei Ordini</a>
+
+            <div>
+                {# Bottone Paga (simulato) - visibile solo se l'ordine è in stato "pending" #}
+                {% if order.status == 'pending' %}
+                    <form action="{% url 'orders:order_pay_simulate' order_id=order.id %}" method="post" class="d-inline me-2">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-success rounded-3">Simula Pagamento</button>
+                    </form>
+                {% endif %}
+
+                {# Bottone Annulla - visibile solo se l'ordine non è già spedito/completato/annullato #}
+                {% if order.status in 'pending paid processing' %}
+                    <form action="{% url 'orders:order_cancel' order_id=order.id %}" method="post" class="d-inline">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-danger rounded-3">Annulla Ordine</button>
+                    </form>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
