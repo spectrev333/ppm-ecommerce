@@ -28,7 +28,8 @@
                                 Ciao, {{ user.username }}
                             </a>
                             <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
-                                <li><a class="dropdown-item" href="#">I miei ordini</a></li> {# Placeholder, puoi implementarlo #}
+                                <li><a class="dropdown-item" href="{% url 'users:profile' %}">Profilo</a></li>
+                                <li><a class="dropdown-item" href="#">I miei ordini</a></li>
                                 <li><hr class="dropdown-divider"></li>
                                 <li>
                                     <form action="{% url 'logout' %}" method="post" class="d-inline">
@@ -43,7 +44,7 @@
                             <a class="nav-link" href="{% url 'login' %}">Login</a> {# Verrà aggiornato con la logica di login #}
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="{% url 'register' %}">Registrati</a> {# Verrà aggiornato con la logica di registrazione #}
+                            <a class="nav-link" href="{% url 'users:register' %}">Registrati</a> {# Verrà aggiornato con la logica di registrazione #}
                         </li>
                     {% endif %}
                 </ul>
