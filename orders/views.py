@@ -3,6 +3,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import Http404
 from django.shortcuts import render, get_object_or_404, redirect
+from django.urls import reverse
 from django.views.decorators.http import require_POST
 from django.views.generic import ListView, DetailView
 
@@ -43,15 +44,16 @@ def order_create(request):
     cart = Cart(request)
     if not cart:
         return redirect('products:product_list')
+    if not request.user.is_authenticated:
+        messages.warning(request, "Per effettuare un ordine, devi essere loggato.")
+        return redirect(f"{reverse('login')}?next={request.path}")
 
     if request.method == 'POST':
         form = OrderCreateForm(request.POST)
         if form.is_valid():
             order = form.save(commit=False)
-            # Collega l'ordine all'utente corrente se loggato
-            if request.user.is_authenticated:
-                order.user = request.user
-            order.save() # Salva l'ordine con l'utente associato
+            order.user = request.user # Collega utente
+            order.save()
 
             for item in cart:
                 OrderItem.objects.create(order=order,
@@ -61,19 +63,16 @@ def order_create(request):
             cart.clear() # Svuota il carrello dopo aver creato l'ordine
             return render(request, 'orders/order_created.html', {'order': order})
     else:
-        # Se l'utente è loggato, pre-popola il form con i suoi dati
-        if request.user.is_authenticated:
-            user_data = {
-                'first_name': request.user.first_name,
-                'last_name': request.user.last_name,
-                'email': request.user.email,
-                'address': request.user.address,
-                'postal_code': request.user.cap,
-                'city': request.user.city,
-            }
-            form = OrderCreateForm(user_data)
-        else:
-            form = OrderCreateForm()
+        # Pre-compila i campi già noti
+        user_data = {
+            'first_name': request.user.first_name,
+            'last_name': request.user.last_name,
+            'email': request.user.email,
+            'address': request.user.address,
+            'postal_code': request.user.cap,
+            'city': request.user.city,
+        }
+        form = OrderCreateForm(user_data)
     return render(request, 'orders/order_create.html', {'cart': cart, 'form': form})
 
 

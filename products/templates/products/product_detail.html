@@ -1,5 +1,7 @@
 <!-- products/templates/products/product_detail.html -->
 {% extends 'base.html' %}
+{% load django_bootstrap5 %}
+
 
 {% block title %}{{ product.name }}{% endblock %}
 
@@ -21,9 +23,7 @@
         <form action="{% url 'orders:cart_add' product.id %}" method="post" class="mt-4">
             {% csrf_token %}
             <div class="input-group mb-3">
-                <label for="{{ cart_product_form.quantity.id_for_label }}" class="input-group-text rounded-start-3">Quantità:</label>
-                {{ cart_product_form.quantity }}
-                {{ cart_product_form.override }}
+                {% bootstrap_form cart_product_form exclude=override layout='inline' %}
             </div>
 
             <button type="submit" class="btn btn-primary btn-lg rounded-3">Aggiungi al Carrello</button>
