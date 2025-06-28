@@ -28,6 +28,23 @@
                         <a class="nav-link" href="{% url 'orders:cart_detail' %}">Carrello</a> {# Verrà aggiornato con la logica del carrello #}
                     </li>
                     {% if user.is_authenticated %}
+                        {% if user.is_superuser or user.is_manager %}
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" href="#" id="managerDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                    Gestione Store
+                                </a>
+                                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="managerDropdown">
+                                    <li><h6 class="dropdown-header">Prodotti & Categorie</h6></li>
+                                    <li><a class="dropdown-item" href="{% url 'products:manager_product_list' %}">Lista Prodotti</a></li>
+                                    <li><a class="dropdown-item" href="{% url 'products:product_create' %}">Aggiungi Prodotto</a></li>
+                                    <li><a class="dropdown-item" href="{% url 'products:manager_category_list' %}">Lista Categorie</a></li>
+                                    <li><a class="dropdown-item" href="{% url 'products:category_create' %}">Aggiungi Categoria</a></li>
+                                    <li><hr class="dropdown-divider"></li>
+                                    <li><h6 class="dropdown-header">Ordini</h6></li>
+                                    <li><a class="dropdown-item" href="{% url 'orders:manager_order_list' %}">Gestisci Ordini</a></li>
+                                </ul>
+                            </li>
+                        {% endif %}
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                                 Ciao, {{ user.username }}

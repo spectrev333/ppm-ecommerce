@@ -9,5 +9,9 @@ class CustomUser(AbstractUser):
     cap = models.CharField(max_length=5, blank=True, null=True)
     city = models.CharField(max_length=50, blank=True, null=True)
 
+    @property
+    def is_manager(self):
+        return self.groups.filter(name='Managers').exists()
+
     def __str__(self):
         return self.username

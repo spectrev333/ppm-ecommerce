@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+
+{% block title %}Conferma Eliminazione Categoria{% endblock %}
+
+{% block content %}
+<div class="alert alert-danger" role="alert">
+    <h4 class="alert-heading">Sei sicuro di voler eliminare la categoria "{{ object.name }}"?</h4>
+    <p>Tutti i prodotti associati a questa categoria potrebbero essere influenzati o eliminati a seconda del modello. Questa azione è irreversibile.</p>
+    <hr>
+    <form method="post">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-danger me-2 rounded-3">Sì, Elimina</button>
+        <a href="{% url 'products:product_list' %}" class="btn btn-secondary rounded-3">Annulla</a> {# Puoi puntare a una lista di categorie se crei una vista #}
+    </form>
+</div>
+{% endblock %}

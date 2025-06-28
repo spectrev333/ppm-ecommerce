@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+{% load django_bootstrap5 %}
+
+{% block title %}{% if form.instance.pk %}Modifica Categoria{% else %}Crea Nuova Categoria{% endif %}{% endblock %}
+
+{% block content %}
+<h1 class="mb-4">{% if form.instance.pk %}Modifica Categoria{% else %}Crea Nuova Categoria{% endif %}</h1>
+<form method="post">
+    {% csrf_token %}
+    {% bootstrap_form form layout="floating" %}
+
+    {% bootstrap_button button_type="submit" content="Salva" button_class="btn btn-primary rounded-3"%}
+    <a href="{% url 'products:product_list' %}" class="btn btn-outline-secondary rounded-3">Annulla</a> {# Puoi puntare a una lista di categorie se crei una vista #}
+</form>
+{% endblock %}

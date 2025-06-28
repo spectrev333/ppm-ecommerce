@@ -1,0 +1,95 @@
+{% extends 'base.html' %}
+
+{% block title %}Dettagli Ordine #{{ order.id }} (Manager){% endblock %}
+
+{% block content %}
+<h1 class="mb-4">Dettagli Ordine #{{ order.id }} (Gestione Manager)</h1>
+
+<div class="card shadow-lg p-4 mb-4">
+    <div class="card-body">
+        <h5 class="card-title mb-3">Informazioni Generali</h5>
+        <p><strong>Utente:</strong> {{ order.user.username }} ({{ order.user.email }})</p>
+        <p><strong>Data Ordine:</strong> {{ order.created|date:"d M Y H:i" }}</p>
+        <p><strong>Ultimo Aggiornamento:</strong> {{ order.updated|date:"d M Y H:i" }}</p>
+        <p><strong>Stato Pagamento:</strong>
+            {% if order.paid %}
+                <span class="badge bg-success">Pagato</span>
+            {% else %}
+                <span class="badge bg-warning text-dark">Non Pagato</span>
+            {% endif %}
+            {# Bottone per toggle paid status #}
+            <form action="{% url 'orders:manager_order_toggle_paid' order_id=order.id %}" method="post" class="d-inline ms-2">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-sm {% if order.paid %}btn-outline-warning{% else %}btn-outline-success{% endif %} rounded-3">
+                    {% if order.paid %}Imposta come Non Pagato{% else %}Imposta come Pagato{% endif %}
+                </button>
+            </form>
+        </p>
+        <p><strong>Stato Ordine:</strong>
+            {% if order.status == 'pending' %}
+                <span class="badge bg-warning text-dark">{{ order.get_status_display }}</span>
+            {% elif order.status == 'paid' or order.status == 'processing' %}
+                <span class="badge bg-info">{{ order.get_status_display }}</span>
+            {% elif order.status == 'shipped' %}
+                <span class="badge bg-primary">In Spedizione</span>
+            {% elif order.status == 'completed' %}
+                <span class="badge bg-success">{{ order.get_status_display }}</span>
+            {% elif order.status == 'cancelled' %}
+                <span class="badge bg-danger">{{ order.get_status_display }}</span>
+            {% else %}
+                <span class="badge bg-secondary">{{ order.get_status_display }}</span>
+            {% endif %}
+        </p>
+        {# Form per aggiornare lo stato dell'ordine #}
+        <form action="{% url 'orders:manager_order_update_status' order_id=order.id %}" method="post" class="mt-2 d-flex align-items-center">
+            {% csrf_token %}
+            <label for="status_select" class="form-label mb-0 me-2">Aggiorna Stato:</label>
+            <select name="status" id="status_select" class="form-select form-select-sm w-auto me-2 rounded-3">
+                {% for status_value, status_label in order.STATUS_CHOICES %}
+                    <option value="{{ status_value }}" {% if order.status == status_value %}selected{% endif %}>
+                        {{ status_label }}
+                    </option>
+                {% endfor %}
+            </select>
+            <button type="submit" class="btn btn-sm btn-primary rounded-3">Aggiorna</button>
+        </form>
+
+
+        <h5 class="card-title mt-4 mb-3">Indirizzo di Spedizione</h5>
+        <p>{{ order.first_name }} {{ order.last_name }}</p>
+        <p>{{ order.address }}</p>
+        <p>{{ order.postal_code }} {{ order.city }}</p>
+        <p>Email: {{ order.email }}</p>
+
+        <h5 class="card-title mt-4 mb-3">Articoli dell'Ordine</h5>
+        <table class="table table-bordered table-striped">
+            <thead>
+                <tr>
+                    <th>Prodotto</th>
+                    <th>Quantità</th>
+                    <th>Prezzo Unitario</th>
+                    <th>Subtotale</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in order.items.all %}
+                    <tr>
+                        <td><a href="{{ item.product.get_absolute_url }}">{{ item.product.name }}</a></td>
+                        <td>{{ item.quantity }}</td>
+                        <td>{{ item.price }} €</td>
+                        <td>{{ item.get_cost }} €</td>
+                    </tr>
+                {% endfor %}
+                <tr class="table-dark">
+                    <td colspan="3" class="text-end fw-bold">Totale Ordine:</td>
+                    <td class="fw-bold">{{ order.get_total_cost }} €</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="d-flex justify-content-between mt-4">
+            <a href="{% url 'orders:manager_order_list' %}" class="btn btn-outline-secondary rounded-3">Torna alla Lista Ordini</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -20,7 +20,11 @@
         <h3 class="fw-bold text-primary mb-3">{{ product.price }} €</h3>
         <p class="lead">{{ product.description }}</p>
 
-        <form action="{% url 'orders:cart_add' product.id %}" method="post" class="mt-4">
+
+        {% if product.available %}
+            <p class="text-success">In Stock</p>
+
+            <form action="{% url 'orders:cart_add' product.id %}" method="post" class="mt-4">
             {% csrf_token %}
             <div class="input-group mb-3">
                 {% bootstrap_form cart_product_form exclude=override layout='inline' %}
@@ -28,6 +32,9 @@
 
             <button type="submit" class="btn btn-primary btn-lg rounded-3">Aggiungi al Carrello</button>
         </form>
+        {% else %}
+            <p class="text-danger">Non In Stock</p>
+        {% endif %}
 
         <a href="{% url 'products:product_list' %}" class="btn btn-outline-secondary mt-4 rounded-3">Torna ai Prodotti</a>
     </div>

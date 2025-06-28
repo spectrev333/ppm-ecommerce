@@ -1,0 +1,75 @@
+{% extends 'base.html' %}
+
+{% block title %}Gestione Prodotti (Manager){% endblock %}
+
+{% block content %}
+<h1 class="mb-4">Gestione Prodotti</h1>
+<p class="text-muted">Visualizza, aggiungi, modifica ed elimina i prodotti del negozio.</p>
+
+<div class="mb-4">
+    <a href="{% url 'products:product_create' %}" class="btn btn-success rounded-3">Aggiungi Nuovo Prodotto</a>
+</div>
+
+{% if products %}
+    <div class="table-responsive">
+        <table class="table table-hover table-striped">
+            <thead class="table-dark">
+                <tr>
+                    <th>Immagine</th>
+                    <th>Nome Prodotto</th>
+                    <th>Categoria</th>
+                    <th>Prezzo</th>
+                    <th>Disponibile</th>
+                    <th>Azioni</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for product in products %}
+                    <tr>
+                        <td>
+                            {% if product.image %}
+                                <img src="{{ product.image.url }}" alt="{{ product.name }}" style="width: 50px; height: 50px; object-fit: cover; border-radius: 5px;">
+                            {% else %}
+                                <img src="https://placehold.co/50x50/cccccc/333333?text=NoImg" alt="No Image" style="width: 50px; height: 50px; object-fit: cover; border-radius: 5px;">
+                            {% endif %}
+                        </td>
+                        <td><a href="{{ product.get_absolute_url }}" class="text-decoration-none text-dark">{{ product.name }}</a></td>
+                        <td>{{ product.category.name }}</td>
+                        <td>{{ product.price }} €</td>
+                        <td>
+                            {% if product.available %}
+                                <span class="badge bg-success">Sì</span>
+                            {% else %}
+                                <span class="badge bg-danger">No</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <a href="{% url 'products:product_update' pk=product.pk %}" class="btn btn-sm btn-primary rounded-3 me-2">Modifica</a>
+                            <a href="{% url 'products:product_delete' pk=product.pk %}" class="btn btn-sm btn-danger rounded-3">Elimina</a>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    {% if is_paginated %}
+        <nav aria-label="Page navigation">
+            <ul class="pagination justify-content-center mt-4">
+                {% if page_obj.has_previous %}
+                    <li class="page-item"><a class="page-link" href="?page={{ page_obj.previous_page_number }}">Precedente</a></li>
+                {% endif %}
+                <li class="page-item disabled"><span class="page-link">Pagina {{ page_obj.number }} di {{ page_obj.paginator.num_pages }}</span></li>
+                {% if page_obj.has_next %}
+                    <li class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number }}">Successiva</a></li>
+                {% endif %}
+            </ul>
+        </nav>
+    {% endif %}
+
+{% else %}
+    <div class="alert alert-info text-center mt-5" role="alert">
+        Non ci sono prodotti da gestire.
+    </div>
+{% endif %}
+{% endblock %}
