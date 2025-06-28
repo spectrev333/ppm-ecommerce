@@ -21,7 +21,7 @@ class ProductListView(ListView):
         category_slug = self.kwargs.get("category_slug")
         if category_slug:
             self.category = get_object_or_404(Category, slug = category_slug)
-            return Product.objects.filter(category=self.category, available=True)
+            return Product.objects.filter(category=self.category)
         return Product.objects.filter()
 
     def get_context_data(
