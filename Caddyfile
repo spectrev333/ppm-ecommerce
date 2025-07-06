@@ -1,0 +1,22 @@
+:443 {
+    handle_path /static/* {
+		file_server {
+			root /srv/static
+		}
+	}
+
+	handle_path /media/* {
+		file_server browse {
+			root /srv/media
+		}
+	}
+
+	handle {
+        reverse_proxy ecommerce:8000
+    }
+
+    log {
+        output stdout
+        format json
+    }
+}

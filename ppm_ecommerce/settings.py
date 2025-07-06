@@ -19,14 +19,16 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
+from dotenv import load_dotenv
+load_dotenv(BASE_DIR / '.env')
+
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = "django-insecure-n19y5vb+3xpwrv(cf8p5vox60nzb^dh(vox1)-^dej+y4%j@c^"
+SECRET_KEY = os.getenv('DJANGO_SECRET_KEY', "django-insecure-n19y5vb+3xpwrv(cf8p5vox60nzb^dh(vox1)-^dej+y4%j@c^")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.getenv('DJANGO_DEBUG', False) == 'True'
 
-ALLOWED_HOSTS = []
-
+ALLOWED_HOSTS = os.getenv('DJANGO_ALLOWED_HOSTS', '127.0.0.1').split(',')
 
 # Application definition
 
@@ -79,12 +81,26 @@ WSGI_APPLICATION = "ppm_ecommerce.wsgi.application"
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
-DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "db.sqlite3",
+DATABASE_CHOICE = os.environ.get('DATABASE_CHOICE', 'sqlite')
+
+if DATABASE_CHOICE == 'postgres':
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql',
+            'NAME': os.environ.get('DATABASE_NAME'),
+            'USER': os.environ.get('DATABASE_USERNAME'),
+            'PASSWORD': os.environ.get('DATABASE_PASSWORD'),
+            'HOST': os.environ.get('DATABASE_HOST'),
+            'PORT': os.environ.get('DATABASE_PORT'),
+        }
     }
-}
+else:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
+        }
+    }
 
 
 # Password validation
