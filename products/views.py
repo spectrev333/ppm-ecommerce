@@ -93,9 +93,14 @@ class ProductDeleteView(ManagerRequiredMixin, DeleteView):
 class CategoryCreateView(ManagerRequiredMixin, CreateView):
     """Vista del manager per la creazione di una nuova categoria."""
     model = Category
-    fields = ['name', 'slug']
+    fields = ['name']
     template_name = 'products/manager/category_form.html'
     success_url = reverse_lazy('products:manager_category_list') # O una lista di categorie
+
+    def form_valid(self, form):
+        if not form.instance.slug:
+            form.instance.slug = slugify(form.instance.name)
+        return super().form_valid(form)
 
 class CategoryUpdateView(ManagerRequiredMixin, UpdateView):
     """Vista del manager per l'aggiornamento di una categoria."""
