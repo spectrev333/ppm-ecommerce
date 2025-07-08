@@ -1,6 +1,7 @@
 services:
     db:
         image: postgres:17
+        restart: always
         environment:
             POSTGRES_DB: ${DATABASE_NAME}
             POSTGRES_USER: ${DATABASE_USERNAME}
@@ -15,6 +16,7 @@ services:
     ecommerce:
         build: .
         container_name: django-ecommerce
+        restart: always
         ports:
             - "8000:8000"
         depends_on:
