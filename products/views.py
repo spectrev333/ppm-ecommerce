@@ -18,11 +18,19 @@ class ProductListView(ListView):
     category = None
 
     def get_queryset(self):
+        queryset = Product.objects.all()
+
         category_slug = self.kwargs.get("category_slug")
         if category_slug:
             self.category = get_object_or_404(Category, slug = category_slug)
-            return Product.objects.filter(category=self.category)
-        return Product.objects.filter()
+            queryset.filter(category=self.category)
+
+        search_query = self.request.GET.get("q")
+        if search_query:
+            self.query = search_query
+            queryset = queryset.filter(name__icontains=search_query, description__icontains=search_query)
+
+        return queryset
 
     def get_context_data(
         self, *, object_list = ..., **kwargs
@@ -30,6 +38,7 @@ class ProductListView(ListView):
         context = super().get_context_data(**kwargs)
         context["categories"] = Category.objects.all()
         context["selected_category"] = self.category
+        context["query"] = self.query
         return context
 
 class ProductDetailView(DetailView):

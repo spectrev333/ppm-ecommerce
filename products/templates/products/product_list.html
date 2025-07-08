@@ -13,6 +13,12 @@
                 <a href="{% url 'products:product_list_by_category' category_slug=cat.slug %}" class="list-group-item list-group-item-action {% if selected_category and selected_category.slug == cat.slug %}active{% endif %}">{{ cat.name }}</a>
             {% endfor %}
         </div>
+
+        <h4 class="mb-3">Cerca Prodotti</h4>
+        <form action="{% url 'products:product_list' %}" method="get" class="input-group mb-3">
+            <input type="text" name="q" class="form-control rounded-start-3" placeholder="Cerca prodotto..." aria-label="Cerca prodotto" value="{{ query|default:'' }}">
+            <button class="btn btn-outline-primary rounded-end-3" type="submit">Cerca</button>
+        </form>
     </div>
     <div class="col-md-9">
         <h2 class="mb-4">Prodotti</h2>
