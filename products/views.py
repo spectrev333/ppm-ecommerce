@@ -63,7 +63,7 @@ def is_superuser_or_manager(user):
     return user.is_superuser or user.is_manager
 
 class ManagerRequiredMixin(LoginRequiredMixin, UserPassesTestMixin):
-    """Verifica che l'utente sia un mangoero o un superuser."""
+    """Verifica che l'utente sia un mango o un superuser."""
     def test_func(self):
         return is_superuser_or_manager(self.request.user)
 
