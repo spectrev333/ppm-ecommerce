@@ -23,7 +23,7 @@ class ProductListView(ListView):
         category_slug = self.kwargs.get("category_slug")
         if category_slug:
             self.category = get_object_or_404(Category, slug = category_slug)
-            queryset.filter(category=self.category)
+            queryset = queryset.filter(category=self.category)
 
         search_query = self.request.GET.get("q")
         self.query = None
@@ -80,17 +80,20 @@ class ProductCreateView(ManagerRequiredMixin, CreateView):
     success_url = reverse_lazy('products:manager_product_list') # Reindirizza alla lista prodotti dopo creazione
 
     def form_valid(self, form):
-        if not form.instance.slug:
-            form.instance.slug = slugify(form.instance.name)
+        form.instance.slug = slugify(form.instance.name)
         return super().form_valid(form)
 
 
 class ProductUpdateView(ManagerRequiredMixin, UpdateView):
     """Vista del manager per l'aggiornamento di un prodotto."""
     model = Product
-    fields = ['category', 'name', 'slug', 'image', 'description', 'price', 'available']
+    fields = ['category', 'name', 'image', 'description', 'price', 'available']
     template_name = 'products/manager/product_form.html'
     success_url = reverse_lazy('products:manager_product_list')  # Reindirizza alla lista prodotti dopo creazione
+
+    def form_valid(self, form):
+        form.instance.slug = slugify(form.instance.name)
+        return super().form_valid(form)
 
 
 class ProductDeleteView(ManagerRequiredMixin, DeleteView):
@@ -115,7 +118,7 @@ class CategoryCreateView(ManagerRequiredMixin, CreateView):
 class CategoryUpdateView(ManagerRequiredMixin, UpdateView):
     """Vista del manager per l'aggiornamento di una categoria."""
     model = Category
-    fields = ['name', 'slug']
+    fields = ['name']
     template_name = 'products/manager/category_form.html'
     success_url = reverse_lazy('products:manager_category_list')
 

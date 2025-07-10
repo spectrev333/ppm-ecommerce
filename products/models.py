@@ -20,6 +20,11 @@ class Category(models.Model):
     def get_absolute_url(self):
         return reverse('products:product_list_by_category', args=[self.slug])
 
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = slugify(self.name)
+        super().save(*args, **kwargs)
+
 
 class Product(models.Model):
     category = ForeignKey(Category, related_name="products", on_delete=models.CASCADE)
