@@ -1,0 +1,34 @@
+{
+    debug
+    crowdsec {
+        api_url http://crowdsec:8080
+        api_key {$BOUNCER_KEY_CADDY}
+    }
+}
+
+http://localhost {
+
+	route {
+        crowdsec
+
+        handle_path /static/* {
+            file_server {
+                root /app/staticfiles
+            }
+        }
+
+        handle_path /media/* {
+            file_server browse {
+                root /app/media
+            }
+        }
+
+        handle {
+            reverse_proxy ecommerce:8000
+        }
+
+	}
+	log {
+		output file /var/log/caddy/access.log
+	}
+}

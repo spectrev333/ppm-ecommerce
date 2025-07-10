@@ -39,17 +39,45 @@ services:
             - ecommerce_static:/app/staticfiles
             - ecommerce_media:/app/media
 
+    caddy:
+        image: serfriz/caddy-crowdsec:latest
+        container_name: caddy-crowdsec
+        restart: always
+        environment:
+            - BOUNCER_KEY_CADDY=${CROWDSEC_API_KEY}
+        ports:
+            - "80:80"
+            - "443:443"
+        volumes:
+            - ./Caddyfile:/etc/caddy/Caddyfile
+            - caddy_data:/data
+            - caddy_config:/config
+            - ecommerce_static:/app/staticfiles
+            - ecommerce_media:/app/media
+            - caddy_logs:/var/log/caddy
+        depends_on:
+            - ecommerce
+
+    crowdsec:
+        image: docker.io/crowdsecurity/crowdsec:latest
+        container_name: crowdsec
+        environment:
+            - GID=1000
+            - COLLECTIONS=crowdsecurity/caddy crowdsecurity/http-cve crowdsecurity/whitelist-good-actors
+            - BOUNCER_KEY_CADDY=${CROWDSEC_API_KEY}
+        volumes:
+            - crowdsec_db:/var/lib/crowdsec/data/
+            - ./acquis.yaml:/etc/crowdsec/acquis.yaml
+            - caddy_logs:/var/log/caddy:ro
+        restart: unless-stopped
+        security_opt:
+            - no-new-privileges=true
+
 volumes:
     postgres_data:
     ecommerce_static:
-        driver: local
-        driver_opts:
-            type: none
-            o: bind
-            device: /var/www/ppm/staticfiles
     ecommerce_media:
-        driver: local
-        driver_opts:
-            type: none
-            o: bind
-            device: /var/www/ppm/media
+    caddy_data:
+    caddy_config:
+    caddy_logs:
+    crowdsec_db:
