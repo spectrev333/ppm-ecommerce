@@ -6,7 +6,7 @@
     }
 }
 
-http://localhost {
+spectrev333.systems {
 
 	route {
         crowdsec
